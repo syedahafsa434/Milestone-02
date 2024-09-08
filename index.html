@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Resume Builder</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: auto;
+        }
+        .section {
+            margin-bottom: 20px;
+        }
+        textarea, input[type="text"], button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #010909;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #28a745;
+            color: rgb(254, 255, 255);
+            cursor: pointer;
+            width: auto;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        .preview {
+            border: 1px solid #ddd;
+            padding: 10px;
+            background: #f9f9f9;
+        }
+        h2 {
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 10px;
+        }
+        .experience-item, .education-item, .skills-item {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .experience-item input, .education-item input, .skills-item input {
+            width: calc(50% - 5px);
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Resume Form -->
+        <div id="resume-form">
+            <!-- Contact Information Section -->
+            <div class="section">
+                <h2>Contact Information</h2>
+                <input type="text" id="fullName" placeholder="Full Name" />
+                <input type="text" id="email" placeholder="Email" />
+                <input type="text" id="phone" placeholder="Phone" />
+                <input type="text" id="linkedin" placeholder="LinkedIn Profile" />
+                <input type="text" id="location" placeholder="Location (City, State, Country)" />
+            </div>
+
+            <!-- Objective Section -->
+            <div class="section">
+                <h2>Objective</h2>
+                <textarea id="objective" rows="4" placeholder="Enter your career objective here..."></textarea>
+            </div>
+
+            <!-- Education Section -->
+            <div class="section" id="education-section">
+                <h2>Education</h2>
+                <div id="education-list">
+                    <div class="education-item">
+                        <input type="text" placeholder="Degree" />
+                        <input type="text" placeholder="Institution" />
+                        <input type="text" placeholder="Year of Graduation" />
+                    </div>
+                </div>
+                <button type="button" onclick="addEducation()">Add Education</button>
+            </div>
+
+            <!-- Experience Section -->
+            <div class="section" id="experience-section">
+                <h2>Experience</h2>
+                <div id="experience-list">
+                    <div class="experience-item">
+                        <input type="text" placeholder="Job Title" />
+                        <input type="text" placeholder="Company" />
+                        <input type="text" placeholder="Years Worked" />
+                    </div>
+                </div>
+                <button type="button" onclick="addExperience()">Add Experience</button>
+            </div>
+
+            <!-- Skills Section -->
+            <div class="section" id="skills-section">
+                <h2>Skills</h2>
+                <div id="skills-list">
+                    <div class="skills-item">
+                        <input type="text" placeholder="Skill" />
+                    </div>
+                </div>
+                <button type="button" onclick="addSkill()">Add Skill</button>
+            </div>
+
+            <button type="button" onclick="showPreview()">Preview Resume</button>
+        </div>
+
+        <!-- Preview Container -->
+        <div id="preview-section" class="hidden">
+            <h2>Resume Preview</h2>
+            <div class="preview" id="resume-preview">
+                <h3 id="preview-name"></h3>
+                <p id="preview-contact"></p>
+                <h4>Objective</h4>
+                <p id="preview-objective"></p>
+                <h4>Education</h4>
+                <ul id="preview-education"></ul>
+                <h4>Experience</h4>
+                <ul id="preview-experience"></ul>
+                <h4>Skills</h4>
+                <ul id="preview-skills"></ul>
+            </div>
+            <button type="button" onclick="backToForm()">Back to Form</button>
+        </div>
+    </div>
+
+    <script>
+        // Function to toggle between form and preview
+        function showPreview() {
+            document.getElementById('resume-form').classList.add('hidden');
+            document.getElementById('preview-section').classList.remove('hidden');
+            updatePreview();
+        }
+
+        function backToForm() {
+            document.getElementById('resume-form').classList.remove('hidden');
+            document.getElementById('preview-section').classList.add('hidden');
+        }
+
+        // Function to dynamically update the preview
+        function updatePreview() {
+            document.getElementById('preview-name').textContent = document.getElementById('fullName').value;
+            document.getElementById('preview-contact').textContent = `${document.getElementById('email').value} | ${document.getElementById('phone').value} | ${document.getElementById('linkedin').value} | ${document.getElementById('location').value}`;
+            document.getElementById('preview-objective').textContent = document.getElementById('objective').value;
+
+            // Education preview
+            const educationItems = Array.from(document.querySelectorAll('#education-list .education-item'));
+            const educationPreview = educationItems.map(item => {
+                const degree = item.querySelector('input:nth-child(1)').value;
+                const institution = item.querySelector('input:nth-child(2)').value;
+                const year = item.querySelector('input:nth-child(3)').value;
+                return `<li>${degree} from ${institution} (${year})</li>`;
+            });
+            document.getElementById('preview-education').innerHTML = educationPreview.join('');
+
+            // Experience preview
+            const experienceItems = Array.from(document.querySelectorAll('#experience-list .experience-item'));
+            const experiencePreview = experienceItems.map(item => {
+                const jobTitle = item.querySelector('input:nth-child(1)').value;
+                const company = item.querySelector('input:nth-child(2)').value;
+                const years = item.querySelector('input:nth-child(3)').value;
+                return `<li>${jobTitle} at ${company} (${years})</li>`;
+            });
+            document.getElementById('preview-experience').innerHTML = experiencePreview.join('');
+
+            // Skills preview
+            const skills = Array.from(document.querySelectorAll('#skills-list .skills-item input')).map(input => input.value);
+            document.getElementById('preview-skills').innerHTML = skills.map(skill => `<li>${skill}</li>`).join('');
+        }
+
+        // Add new education field
+        function addEducation() {
+            const educationList = document.getElementById('education-list');
+            const div = document.createElement('div');
+            div.className = 'education-item';
+            div.innerHTML = `
+                <input type="text" placeholder="Degree" />
+                <input type="text" placeholder="Institution" />
+                <input type="text" placeholder="Year of Graduation" />
+            `;
+            educationList.appendChild(div);
+        }
+
+        // Add new experience field
+        function addExperience() {
+            const experienceList = document.getElementById('experience-list');
+            const div = document.createElement('div');
+            div.className = 'experience-item';
+            div.innerHTML = `
+                <input type="text" placeholder="Job Title" />
+                <input type="text" placeholder="Company" />
+                <input type="text" placeholder="Years Worked" />
+            `;
+            experienceList.appendChild(div);
+        }
+
+        // Add new skill field
+        function addSkill() {
+            const skillsList = document.getElementById('skills-list');
+            const div = document.createElement('div');
+            div.className = 'skills-item';
+            div.innerHTML = `
+                <input type="text" placeholder="Skill" />
+            `;
+            skillsList.appendChild(div);
+        }
+    </script>
+</body>
+</html>
+
+
+
